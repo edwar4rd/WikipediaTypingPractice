@@ -211,7 +211,7 @@ def handleTypingScreen(link, lineOffset):
         if c == KEY_F1:
             return links, GO_TO_HELP
 
-        elif c == KEY_BACKSP:
+        elif c == 8 or c == 127 or c == KEY_BACKSP:
             x = x - 1
 
             if x < 0 and y > 0:
