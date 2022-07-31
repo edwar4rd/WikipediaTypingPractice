@@ -170,7 +170,13 @@ def handleTypingScreen(link, lineOffset):
 
     x = 0
     y = 0
-    currentChar = lines[0][0]
+    while y < len(lines) and len(lines[y]) == 0:
+        # Skip empty lines
+        y += 1
+    if y >= lineCount:
+        # Go to next page
+        return handleTypingScreen(link, lineOffset + lineCount)
+    currentChar = lines[y][0]
     c = chr(80)
 
     mistakes = 0
