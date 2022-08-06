@@ -188,6 +188,8 @@ def handleTypingScreen(link, lineOffset):
     correct = 0
 
     starting_time = datetime.now()
+    last_time = starting_time
+    sleeptime = 0
 
     while True:
         # Debug
@@ -197,7 +199,7 @@ def handleTypingScreen(link, lineOffset):
 
         time_on_page = datetime.now() - starting_time
         written_words = correct / 5.0
-        wpm = (written_words / time_on_page.total_seconds()) * 60.0
+        wpm = (written_words / (time_on_page.total_seconds() - sleeptime)) * 60.0
 
         infoStr = "Correct: " + str(correct).ljust(4)
         infoStr += " Mistakes: " + str(mistakes).ljust(3)
@@ -213,6 +215,12 @@ def handleTypingScreen(link, lineOffset):
         stdscr.addstr(infoBar2Y, leftMargin, infoStr2)
 
         c = stdscr.getch()
+        
+        this_time = datetime.now()
+        if (this_time - last_time).total_seconds() > 2:
+            sleeptime += (this_time - last_time).total_seconds() - 2
+        last_time = this_time
+
         if c == KEY_ESC:
             return 0, GO_TO_EXIT
 
