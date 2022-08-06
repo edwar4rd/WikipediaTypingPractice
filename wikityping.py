@@ -28,6 +28,7 @@ KEY_F1 = 265
 # Colors
 C_RED = 1
 C_YELLOW = 2
+C_CYAN = 3
 
 # Signals
 GO_TO_LINK_SELECTION = 0
@@ -78,10 +79,11 @@ def splitIntoLines(text, textWidth, lineOffset = 0):
         return lines[lineOffset:], linesMeta[lineOffset:]
 
 def startup():
-    global stdscr, C_RED, C_YELLOW
+    global stdscr, C_RED, C_YELLOW, C_CYAN
     curses.start_color()
     curses.init_pair(C_RED, curses.COLOR_BLACK, curses.COLOR_RED)
     curses.init_pair(C_YELLOW, curses.COLOR_BLACK, curses.COLOR_YELLOW)
+    curses.init_pair(C_CYAN, curses.COLOR_BLACK, curses.COLOR_CYAN)
     curses.noecho()
     curses.cbreak()
     stdscr.keypad(True)
@@ -93,7 +95,7 @@ def writeTextLines(number):
         stdscr.addstr(i + topMargin, leftMargin, lines[i])
 
 def advanceCursor(y, x):
-    global stdscr, leftMargin, topMargin, lines, meta, C_RED, C_YELLOW
+    global stdscr, leftMargin, topMargin, lines, meta, C_RED, C_YELLOW, C_CYAN
 
     # skip empty lines
     while len(lines[y]) == 0:
@@ -120,6 +122,8 @@ def advanceCursor(y, x):
         stdscr.addstr(topMargin + y, leftMargin + x, lines[y][x], curses.color_pair(C_RED))
     elif meta[y][x] == 'c': # Corrected
         stdscr.addstr(topMargin + y, leftMargin + x, lines[y][x], curses.color_pair(C_YELLOW))
+    elif meta[y][x] == 'x': # Skipped ( For non-asciis )
+        stdscr.addstr(topMargin + y, leftMargin + x, lines[y][x], curses.color_pair(C_CYAN))
 
     return c
 
@@ -205,7 +209,7 @@ def handleTypingScreen(link, lineOffset):
         infoBar2Y = infoBarY + 1
         infoStr2 = "Title: " + str(link).ljust(25)
         infoStr2 += "Pages: " + str(done_page).ljust(4)
-        
+
         stdscr.addstr(infoBar2Y, leftMargin, infoStr2)
 
         c = stdscr.getch()
@@ -244,6 +248,9 @@ def handleTypingScreen(link, lineOffset):
                 meta[y][x] = 'c'  # Corrected
             else:
                 meta[y][x] = 'o'  # Okay
+
+        elif not currentChar.isascii():
+            meta[y][x] = 'x'  # Skipped (not a ascii character)
 
         elif chr(c) != currentChar:
             mistakes += 1
