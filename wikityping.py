@@ -17,6 +17,7 @@ parser.add_argument('--article',
                     help='Article to start with (optional)')
 
 args = vars(parser.parse_args())
+done_page = 0
 
 # Keys
 KEY_ESC = 27
@@ -154,7 +155,7 @@ def shutdown():
     sys.exit(0)
 
 def handleTypingScreen(link, lineOffset):
-    global stdscr, height, width, leftMargin, topMargin, lines, meta, C_YELLOW
+    global stdscr, height, width, leftMargin, topMargin, lines, meta, C_YELLOW, done_page
 
     text, links = getString(link)
     lines, meta = splitIntoLines(text, textWidth, lineOffset)
@@ -200,6 +201,12 @@ def handleTypingScreen(link, lineOffset):
         infoStr += " WPM: " + str(round(wpm, 2)).ljust(3)
 
         stdscr.addstr(infoBarY, leftMargin, infoStr)
+
+        infoBar2Y = infoBarY + 1
+        infoStr2 = "Title: " + str(link).ljust(25)
+        infoStr2 += "Pages: " + str(done_page).ljust(4)
+        
+        stdscr.addstr(infoBar2Y, leftMargin, infoStr2)
 
         c = stdscr.getch()
         if c == KEY_ESC:
@@ -252,6 +259,7 @@ def handleTypingScreen(link, lineOffset):
                 y += 1
             if y >= lineCount:
                 # Go to next page
+                done_page = done_page + 1
                 return handleTypingScreen(link, lineOffset + lineCount)
 
         currentChar = advanceCursor(y, x)
