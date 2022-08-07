@@ -8,6 +8,7 @@ from datetime import datetime
 import argparse
 
 wikiAPI = wikipediaapi.Wikipedia(language='en', extract_format=wikipediaapi.ExtractFormat.WIKI)
+wikiAPICache = {}
 parser = argparse.ArgumentParser(description='Practice typing while reading Wikipedia articles')
 parser.add_argument('--article',
                     type=str,
@@ -38,8 +39,14 @@ GO_TO_HELP = 3
 GO_TO_STATISTICS = 4
 
 def getString(link):
-    global wikiAPI
-    page_py = wikiAPI.page(link)
+    global wikiAPI, wikiAPICache
+
+    if link in wikiAPICache:
+        page_py = wikiAPICache[link]
+    else:
+        page_py = wikiAPI.page(link)
+        wikiAPICache[link] = page_py
+    
     links = page_py.links.items()
 
     text = page_py.title + "\n\n" + page_py.text # summary
