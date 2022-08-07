@@ -9,9 +9,27 @@ import argparse
 
 wikiAPI = wikipediaapi.Wikipedia(language='en', extract_format=wikipediaapi.ExtractFormat.WIKI)
 wikiAPICache = {}
+
+def checkPage(name):
+    global wikiAPI, wikiAPICache
+
+    if name in wikiAPICache:
+        page_py = wikiAPICache[name]
+    else:
+        page_py = wikiAPI.page(name)
+        wikiAPICache[name] = page_py
+    
+    return page_py.exists()
+
+def pageTitle(name):
+    name = name[0].upper() + name[1:]
+    if not checkPage(name):
+        raise argparse.ArgumentTypeError("Wikipedia does not have an article with this exact name!")
+    return name
+
 parser = argparse.ArgumentParser(description='Practice typing while reading Wikipedia articles')
 parser.add_argument('--article',
-                    type=str,
+                    type=pageTitle,
                     action='store',
                     metavar='name',
                     default="Python_(programming_language)",
