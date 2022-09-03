@@ -76,7 +76,7 @@ def getString(link):
     while "  " in text:
         text = text.replace("  ", " ")
 
-    text = re.sub("([a-z])\.([A-Z])", "\g<1>. \g<2>", text)
+    text = re.sub("([a-z])\.([A-Z])", "\g<1>.\n\n\g<2>", text)
 
     # links is tuple, we only need first
     return text, [link[0] for link in links]
